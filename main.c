@@ -1,35 +1,25 @@
 #include <stdio.h>
+#include <stdint.h>
+#include <assert.h>
 #include "integer-input.h"
 
-void printInt(int n)
+void printInt(void *p, size_t width)
 {
-	size_t nAllocated = 24, i = 0;
-	unsigned char *array = calloc(nAllocated, sizeof(*array));
-	while (n) {
-		if (i == nAllocated) {
-			nAllocated += 10;
-			unsigned char *tmp = realloc(array, sizeof(*tmp) * nAllocated);
-			if (!tmp) {
-				fprintf(stderr, "realloc failed.");
-				exit(EXIT_FAILURE);
-			}
-			array = tmp;
-		}
-		array[i++] = n % 256;
-		n /= 256;
-	}
-	while (i > 0) {
-		printf("%02x", array[--i]);
-	}
+	unsigned char *bytes = (unsigned char *)(p);
+	for (ssize_t i = width - 1; i >= 0; --i) {
+		printf("%02x ", *(bytes + i));
+	}  
 	printf("\n");
-	free(array);
 }
 
 int main()
 {
+	puts("Enter an integer: ");
 	int n = 0;
 	intFromStdin(&n);
-	printf("You entered %d\n", n);
-	printInt(n);
+	printInt(&n, sizeof(n));
+
+//	long long l = 16711680;
+//	printInt(&l, sizeof(l));
 	return 0;
 }
